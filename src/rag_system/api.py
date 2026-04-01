@@ -355,10 +355,10 @@ async def _execute_search(
         else:
             fallback_results.append(result_item)
 
-    if matched_results:
-        return matched_results[:top_k]
-
-    return fallback_results[:top_k]
+    results = matched_results[:top_k]
+    if len(results) < top_k:
+        results.extend(fallback_results[: top_k - len(results)])
+    return results
 
 
 @api_router.post("/search", response_model=SearchResponse)

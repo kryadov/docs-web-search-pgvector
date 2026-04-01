@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 import logging
 
@@ -11,6 +12,19 @@ from rag_system.services.embedding import HashEmbeddingService
 
 
 logger = logging.getLogger(__name__)
+
+
+def _parse_chunk_and_embed(
+    source_bytes: bytes,
+    file_extension: str,
+    embedder: HashEmbeddingService,
+    chunk_size: int,
+    chunk_overlap: int,
+) -> tuple[list, list, list[list[float]]]:
+    pages = parse_document(file_extension, source_bytes)
+    chunks = chunk_pages(pages, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    vectors = embedder.embed_batch([chunk.content for chunk in chunks])
+    return pages, chunks, vectors
 
 
 async def process_document(
@@ -41,9 +55,14 @@ async def process_document(
         await session.commit()
 
     try:
-        pages = parse_document(file_extension, source_bytes)
-        chunks = chunk_pages(pages, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-        vectors = embedder.embed_batch([chunk.content for chunk in chunks])
+        pages, chunks, vectors = await asyncio.to_thread(
+            _parse_chunk_and_embed,
+            source_bytes,
+            file_extension,
+            embedder,
+            chunk_size,
+            chunk_overlap,
+        )
 
         async with session_factory() as session:
             document = await session.scalar(
