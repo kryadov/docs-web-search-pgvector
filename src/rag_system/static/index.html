@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAG Search by Workspace</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+<main>
+    <h1>Docs search</h1>
+
+    <div class="tabs" role="tablist" aria-label="Sections">
+        <button type="button" class="tab-button" id="searchTabButton" data-tab-target="searchTab" role="tab" aria-controls="searchTab" aria-selected="true">Search</button>
+        <button type="button" class="tab-button" id="workspacesTabButton" data-tab-target="workspacesTab" role="tab" aria-controls="workspacesTab" aria-selected="false">Projects / Workspaces</button>
+        <button type="button" class="tab-button" id="uploadTabButton" data-tab-target="uploadTab" role="tab" aria-controls="uploadTab" aria-selected="false">Document Upload</button>
+    </div>
+
+    <div id="uploadMessage" class="status"></div>
+
+    <section class="panel tab-panel" id="searchTab" data-tab-panel role="tabpanel" aria-labelledby="searchTabButton">
+        <h2>Search</h2>
+        <form id="searchForm">
+            <input type="text" id="queryInput" placeholder="Enter a search query" required />
+            <input type="number" id="topKInput" min="1" max="20" value="5" />
+            <button type="submit">Search</button>
+        </form>
+        <table>
+            <thead>
+            <tr>
+                <th>Document</th>
+                <th>Page</th>
+                <th>Fragment</th>
+                <th>Similarity</th>
+                <th>Link</th>
+            </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+        </table>
+
+        <h3>Search History</h3>
+        <ul id="historyList"></ul>
+    </section>
+
+    <section class="panel tab-panel" id="workspacesTab" data-tab-panel role="tabpanel" aria-labelledby="workspacesTabButton" hidden>
+        <h2>Projects / Workspaces</h2>
+        <form id="workspaceForm">
+            <input type="text" id="workspaceName" placeholder="New project name" required minlength="2" />
+            <button type="submit">Create project</button>
+        </form>
+        <div class="workspace-select">
+            <label for="workspaceSelect">Active project:</label>
+            <select id="workspaceSelect"></select>
+            <button id="refreshWorkspaces" type="button">Refresh</button>
+        </div>
+    </section>
+
+    <section class="panel tab-panel" id="uploadTab" data-tab-panel role="tabpanel" aria-labelledby="uploadTabButton" hidden>
+        <h2>Document Upload</h2>
+        <form id="uploadForm">
+            <input type="file" id="fileInput" accept=".pdf,.docx,.txt" required multiple />
+            <button type="submit">Upload</button>
+        </form>
+        <ul id="uploadProgressList"></ul>
+        <ul id="documentsList"></ul>
+    </section>
+</main>
+
+<script src="/static/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rag_search
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rag_search"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: rag-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      RAG_DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/rag_search
+      RAG_UPLOADS_DIR: data/uploads
+      RAG_EMBEDDING_DIM: "384"
+      HOST: 0.0.0.0
+      PORT: "8000"
+      LOG_LEVEL: info
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
