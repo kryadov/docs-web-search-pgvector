@@ -2,6 +2,8 @@
 
 A workspace-isolated RAG document search system built on top of `PostgreSQL + pgvector`.
 
+![img.png](img.png)
+
 ## Stack
 
 - Python `3.14`

@@ -118,6 +118,15 @@ def _store_document_file(
     return stored_path
 
 
+def _resolve_existing_storage_path(document: Document) -> Path | None:
+    direct_path = Path(document.storage_path)
+    fallback_path = settings.uploads_dir / str(document.workspace_id) / f"{document.id}{document.file_type}"
+    for path in (direct_path, fallback_path):
+        if path.exists():
+            return path
+    return None
+
+
 @api_router.post("/workspaces", response_model=WorkspaceResponse, status_code=status.HTTP_201_CREATED)
 async def create_workspace(request: WorkspaceCreateRequest, session: AsyncSession = Depends(get_db)) -> WorkspaceResponse:
     existing = await session.scalar(select(Workspace).where(Workspace.name == request.name.strip()))
@@ -288,8 +297,8 @@ async def download_document(
     session: AsyncSession = Depends(get_db),
 ) -> FileResponse:
     document = await ensure_document_in_workspace(session, workspace_id, document_id)
-    path = Path(document.storage_path)
-    if not path.exists():
+    path = _resolve_existing_storage_path(document)
+    if path is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Файл не найден")
     return FileResponse(path=path, filename=document.filename)
 
@@ -301,12 +310,12 @@ async def delete_document(
     session: AsyncSession = Depends(get_db),
 ) -> None:
     document = await ensure_document_in_workspace(session, workspace_id, document_id)
-    path = Path(document.storage_path)
+    path = _resolve_existing_storage_path(document)
 
     await session.delete(document)
     await session.commit()
 
-    if path.exists():
+    if path is not None:
         path.unlink()
 
 
