@@ -3,23 +3,23 @@ name = "docs-web-search-pgvector"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
-    "fastapi>=0.116.0",
+    "fastapi>=0.142.4",
     "uvicorn[standard]>=0.54.0",
-    "sqlalchemy>=2.0.41",
-    "asyncpg>=0.30.0",
-    "pgvector>=0.4.1",
-    "pydantic-settings>=2.10.1",
-    "python-multipart>=0.0.20",
+    "sqlalchemy>=2.1.4",
+    "asyncpg>=0.32.0",
+    "pgvector>=0.5.0",
+    "pydantic-settings>=2.15.0",
+    "python-multipart>=0.0.32",
     "pypdf>=6.21.1",
     "python-docx>=1.2.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.4.1",
-    "pytest-asyncio>=1.1.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
     "httpx>=0.28.1",
-    "ruff>=0.12.5",
+    "ruff>=0.16.10",
 ]
 
 [tool.pytest.ini_options]
